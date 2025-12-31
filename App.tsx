@@ -5,6 +5,7 @@ import Grid from './components/Grid';
 import HUD from './components/HUD';
 import DraggableShape from './components/DraggableShape';
 import GameOverModal from './components/GameOverModal';
+import BackgroundCollage from './components/BackgroundCollage';
 import { GRID_SIZE } from './constants';
 import { Point } from './types';
 import { canPlaceShape } from './lib/gameUtils';
@@ -176,8 +177,11 @@ const App: React.FC = () => {
   } : { opacity: 0, width: 'auto', height: 'auto' };
 
   return (
-    <div ref={containerRef} className="h-[100dvh] w-full flex flex-col items-center justify-between py-8 bg-[#293556] overflow-hidden select-none touch-none focus:outline-none relative">
+    <div ref={containerRef} className="h-[100dvh] w-full flex flex-col items-center justify-between py-8 overflow-hidden select-none touch-none focus:outline-none relative">
       
+      {/* Dynamic Background */}
+      <BackgroundCollage />
+
       <HUD score={score} highScore={highScore} onReset={resetGame} />
 
       {/* Game Board with Glow & Shake */}
@@ -186,7 +190,7 @@ const App: React.FC = () => {
         animate={isShaking ? { x: [-5, 5, -5, 5, 0] } : { x: 0 }}
         transition={{ duration: 0.15 }} // Quicker shake
       >
-        <div className="absolute -inset-4 bg-blue-500/20 rounded-3xl blur-xl" />
+        <div className="absolute -inset-4 bg-blue-500/10 rounded-3xl blur-xl" />
         
         <div 
             ref={gridRef}
@@ -206,7 +210,10 @@ const App: React.FC = () => {
       </motion.div>
 
       {/* Shapes Tray */}
-      <div className="w-full max-w-lg h-44 flex justify-around items-center px-4 pb-6 z-20">
+      <div className="w-full max-w-lg h-44 flex justify-around items-center px-4 pb-6 z-20 relative">
+        {/* Subtle background for tray legibility */}
+        <div className="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/80 to-transparent -z-10" />
+        
         {isReady && currentShapes.map((shape, idx) => (
             shape ? (
                 <DraggableShape

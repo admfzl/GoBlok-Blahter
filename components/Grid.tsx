@@ -78,8 +78,8 @@ const Grid: React.FC<GridProps> = ({ grid, ghostShape, ghostPos, clearingLines, 
 
   return (
     <div className="relative">
-        <div className="bg-[#1F2942] p-3 rounded-2xl shadow-2xl border border-white/5">
-          {/* Removed gap-1 to allow blocks to touch */}
+        {/* Updated Background: More transparent (60% opacity) to let Sunghoon show through clearly */}
+        <div className="bg-[#1F2942]/60 backdrop-blur-sm p-3 rounded-2xl shadow-2xl border border-white/10">
           <div className="grid grid-rows-8 w-full aspect-square">
             {grid.map((row, r) => (
                 <div key={r} className="grid grid-cols-8">
