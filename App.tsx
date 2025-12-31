@@ -52,14 +52,16 @@ const App: React.FC = () => {
        
        const hudHeight = 140; 
        const trayHeight = 180;
-       const pagePadding = 24;
+       const pagePadding = 16; // Reduced padding
 
-       const availableWidth = Math.min(viewportWidth - pagePadding, 450); 
+       // Increased max width to 600px for larger blocks on desktop/tablet
+       const availableWidth = Math.min(viewportWidth - pagePadding, 600); 
        const availableHeight = viewportHeight - hudHeight - trayHeight - pagePadding;
        const safeAvailableHeight = Math.max(availableHeight, 200);
 
        const GRID_INTERNAL_PADDING = 24; 
-       const GRID_GAPS = (GRID_SIZE - 1) * 4; 
+       // Removed GRID_GAPS calculation since we want blocks to touch
+       const GRID_GAPS = 0; 
 
        const sizeBasedOnWidth = Math.floor((availableWidth - GRID_GAPS - GRID_INTERNAL_PADDING) / GRID_SIZE);
        const sizeBasedOnHeight = Math.floor((safeAvailableHeight - GRID_GAPS - GRID_INTERNAL_PADDING) / GRID_SIZE);
@@ -107,10 +109,10 @@ const App: React.FC = () => {
             clientY >= rect.top - hitPadding && 
             clientY <= rect.bottom + hitPadding
         ) {
-            const gap = 4;
-            const totalCellSize = cellSize + gap;
+            // Gap is now 0, simpler calculation
+            const totalCellSize = cellSize;
             
-            const gridOriginX = rect.left + 12;
+            const gridOriginX = rect.left + 12; // +12 matches p-3 (12px) padding
             const gridOriginY = rect.top + 12;
             const fingerYOffset = cellSize * 2.5; 
             const effectiveY = clientY - fingerYOffset;
@@ -166,10 +168,11 @@ const App: React.FC = () => {
       activeGhostShape = currentShapes[keyboardTrayIndex];
   }
 
+  // Adjusted container style: No gaps in width calculation
   const containerStyle = isReady ? {
       opacity: 1,
-      width: (cellSize * GRID_SIZE) + ((GRID_SIZE - 1) * 4) + 24, 
-      height: (cellSize * GRID_SIZE) + ((GRID_SIZE - 1) * 4) + 24
+      width: (cellSize * GRID_SIZE) + 24, // 24 is padding (p-3 * 2)
+      height: (cellSize * GRID_SIZE) + 24
   } : { opacity: 0, width: 'auto', height: 'auto' };
 
   return (

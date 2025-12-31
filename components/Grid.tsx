@@ -1,6 +1,6 @@
 import React from 'react';
 import { GridType, Point, ShapeDefinition } from '../types';
-import Block from './Block';
+import Block, { BlockConnections } from './Block';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Popup } from '../hooks/useBlockBlast';
 
@@ -17,11 +17,30 @@ const Grid: React.FC<GridProps> = ({ grid, ghostShape, ghostPos, clearingLines, 
     const isClearing = clearingLines.rows.includes(r) || clearingLines.cols.includes(c);
     const cellColor = grid[r][c];
 
+    // Filled Block
     if (cellColor) {
-        return <Block key={`${r}-${c}-filled`} color={cellColor} isClearing={isClearing} className="w-full h-full" />;
+        const connections: BlockConnections = {
+            top: r > 0 && grid[r-1][c] === cellColor,
+            bottom: r < grid.length - 1 && grid[r+1][c] === cellColor,
+            left: c > 0 && grid[r][c-1] === cellColor,
+            right: c < grid[0].length - 1 && grid[r][c+1] === cellColor,
+        };
+
+        return (
+            <Block 
+                key={`${r}-${c}-filled`} 
+                color={cellColor} 
+                isClearing={isClearing} 
+                className="w-full h-full"
+                connections={connections} 
+            />
+        );
     }
     
+    // Ghost Calculation
     let isGhost = false;
+    let ghostConnections: BlockConnections = { top: false, right: false, bottom: false, left: false };
+    
     if (ghostShape && ghostPos) {
       const localR = r - ghostPos.r;
       const localC = c - ghostPos.c;
@@ -31,12 +50,27 @@ const Grid: React.FC<GridProps> = ({ grid, ghostShape, ghostPos, clearingLines, 
       ) {
         if (ghostShape.matrix[localR][localC] === 1) {
           isGhost = true;
+          // Check ghost internal connections
+          ghostConnections = {
+            top: localR > 0 && ghostShape.matrix[localR-1][localC] === 1,
+            bottom: localR < ghostShape.matrix.length - 1 && ghostShape.matrix[localR+1][localC] === 1,
+            left: localC > 0 && ghostShape.matrix[localR][localC-1] === 1,
+            right: localC < ghostShape.matrix[0].length - 1 && ghostShape.matrix[localR][localC+1] === 1,
+          };
         }
       }
     }
 
     if (isGhost && ghostShape) {
-         return <Block key={`${r}-${c}-ghost`} color={ghostShape.color} isGhost={true} className="w-full h-full" />;
+         return (
+            <Block 
+                key={`${r}-${c}-ghost`} 
+                color={ghostShape.color} 
+                isGhost={true} 
+                className="w-full h-full" 
+                connections={ghostConnections}
+            />
+        );
     }
 
     return <Block key={`${r}-${c}-empty`} color={null} className="w-full h-full" />;
@@ -45,9 +79,10 @@ const Grid: React.FC<GridProps> = ({ grid, ghostShape, ghostPos, clearingLines, 
   return (
     <div className="relative">
         <div className="bg-[#1F2942] p-3 rounded-2xl shadow-2xl border border-white/5">
-          <div className="grid grid-rows-8 gap-1 w-full aspect-square">
+          {/* Removed gap-1 to allow blocks to touch */}
+          <div className="grid grid-rows-8 w-full aspect-square">
             {grid.map((row, r) => (
-                <div key={r} className="grid grid-cols-8 gap-1">
+                <div key={r} className="grid grid-cols-8">
                     {row.map((_, c) => (
                         <div 
                             key={`${r}-${c}`} 
